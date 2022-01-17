@@ -1,5 +1,5 @@
 //
-// Copyright Aliaksei Levin (levlam@telegram.org), Arseny Smirnov (arseny30@gmail.com) 2014-2021
+// Copyright Aliaksei Levin (levlam@telegram.org), Arseny Smirnov (arseny30@gmail.com) 2014-2022
 //
 // Distributed under the Boost Software License, Version 1.0. (See accompanying
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -1233,6 +1233,17 @@ string LinkManager::get_dialog_invite_link_hash(Slice invite_link) {
   }
   const auto url_query = parse_url_query(link_info.query_);
   return get_url_query_hash(link_info.is_tg_, url_query);
+}
+
+string LinkManager::get_dialog_invite_link(Slice hash, bool is_internal) {
+  if (!is_base64url_characters(hash)) {
+    return string();
+  }
+  if (is_internal) {
+    return PSTRING() << "tg:join?invite=" << hash;
+  } else {
+    return PSTRING() << G()->shared_config().get_option_string("t_me_url", "https://t.me/") << '+' << hash;
+  }
 }
 
 UserId LinkManager::get_link_user_id(Slice url) {
